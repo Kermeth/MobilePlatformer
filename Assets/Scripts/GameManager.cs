@@ -40,4 +40,20 @@ public class GameManager : Singleton<GameManager> {
         }
     }
     #endregion Player
+
+    #region InputManager
+    private InputManager _input;
+    public InputManager input {
+        get {
+            if (_input == null) {
+                _input=FindObjectOfType<InputManager>();
+                if(_input == null) {
+                    GameObject g = new GameObject("InputManager(Singleton)");
+                    _input = g.AddComponent<InputManager>();
+                }
+            }
+            return _input;
+        }
+    }
+    #endregion InputManager
 }

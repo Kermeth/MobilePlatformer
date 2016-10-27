@@ -31,7 +31,7 @@ public class CameraBehaviour : MonoBehaviour {
     {
         if (GameManager.Instance.currentState==GameState.Playing)
         {
-            this.transform.position = Vector3.SmoothDamp(this.transform.position, target.transform.position+offset, ref velocity, Time.deltaTime);
+            this.transform.position = Vector3.SmoothDamp(this.transform.position, target.transform.position+offset, ref velocity, Time.deltaTime *5f);
         }
     }
 
