@@ -4,28 +4,40 @@ using System.Collections;
 public class GameManager : Singleton<GameManager> {
 
 
+    #region GameState
     // Event Handler
     public delegate void OnGameStateChange(GameState state);
     public event OnGameStateChange OnStateChanged;
-
-    private GameState _current;
-    public GameState current
+    private GameState _currentState;
+    public GameState currentState
     {
         get
         {
-            if (_current == null)
-            {
-                _current = GameState.Pause;
-            }
-            return _current;
+            return _currentState;
         }
         set
         {
-            _current = value;
+            _currentState = value;
             if (OnStateChanged != null)
             {
-                OnStateChanged(_current);
+                OnStateChanged(_currentState);
             }
         }
     }
+    #endregion GameState
+
+    #region Player
+    private Player _player;
+    public Player player
+    {
+        get
+        {
+            if (_player == null)
+            {
+                _player = FindObjectOfType<Player>();
+            }
+            return _player;
+        }
+    }
+    #endregion Player
 }
