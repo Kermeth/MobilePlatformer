@@ -65,7 +65,7 @@ public class InputManager : MonoBehaviour {
                 }
             }
 
-            if (Input.GetTouch(0).phase == TouchPhase.Began)
+            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
             {
                 if(Input.GetTouch(0).position.x >= Screen.width / 2)
                 {

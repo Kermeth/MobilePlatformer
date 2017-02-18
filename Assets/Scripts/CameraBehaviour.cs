@@ -3,7 +3,8 @@ using System.Collections;
 
 public class CameraBehaviour : MonoBehaviour {
 
-    public Vector3 offset = new Vector3(0,0,-10);
+    public float offsetX = 1f;
+    public float offsetY = 1f;
     public bool following = true;
     private GameObject target;
 
@@ -31,7 +32,13 @@ public class CameraBehaviour : MonoBehaviour {
     {
         if (GameManager.Instance.currentState==GameState.Playing)
         {
-            this.transform.position = Vector3.SmoothDamp(this.transform.position, target.transform.position+offset, ref velocity, Time.deltaTime *5f);
+            this.transform.position = Vector3.SmoothDamp(this.transform.position,
+                target.transform.position + new Vector3(
+                    target.transform.localScale.x * offsetX,
+                    offsetY,
+                    -10),
+                ref velocity, 
+                Time.deltaTime *5f);
         }
     }
 

@@ -2,45 +2,87 @@
 using System.Collections;
 using System;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour {
 
-    private Rigidbody2D rigidb {
-        get {
-            return this.GetComponent<Rigidbody2D>();
-        }
-    }
-    private float minimumForce = 100f;
+    [SerializeField]
+    private bool grounded;
+
+    private Rigidbody2D rigidb;
+    private Animator anim;
+    private float jumpForce = 100f;
+    private float moveForce = 10f;
+
 
     #region Monobehaviours
-    void OnEnable()
-    {
+    void OnEnable() {
         //Suscribe to movement Events
-        GameManager.Instance.input.OnLeftScreenTouchStationary += MoveLeft;
-        GameManager.Instance.input.OnRightScreenTouchStationary += MoveRight;
-        GameManager.Instance.input.OnJumpTouched += Jump;
+        SuscribeToEvents();
 
         GameManager.Instance.currentState = GameState.Playing;
+        rigidb = this.GetComponent<Rigidbody2D>();
+        anim = this.GetComponentInChildren<Animator>();
     }
 
     void OnDisable() {
+        UnSuscribeToEvents();
+    }
+
+    void FixedUpdate() {
+        UpdateAnimations();
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision) {
+        if (CheckGrounded(collision.gameObject)) {
+            grounded = true;
+        }
+    }
+
+    public void OnCollisionExit2D(Collision2D collision) {
+        if(CheckGrounded(collision.gameObject) && grounded) {
+            grounded = false;
+        }
+    }
+
+    #endregion Monobehaviours
+
+    private void SuscribeToEvents() {
+        GameManager.Instance.input.OnLeftScreenTouchStationary += MoveLeft;
+        GameManager.Instance.input.OnRightScreenTouchStationary += MoveRight;
+        GameManager.Instance.input.OnJumpTouched += Jump;
+    }
+
+    private void UnSuscribeToEvents() {
         GameManager.Instance.input.OnLeftScreenTouchStationary -= MoveLeft;
         GameManager.Instance.input.OnRightScreenTouchStationary -= MoveRight;
         GameManager.Instance.input.OnJumpTouched -= Jump;
     }
 
-    
-    #endregion Monobehaviours
+
+    private bool CheckGrounded(GameObject subject) {
+        if (subject.gameObject.layer==LayerMask.NameToLayer("Ground")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private void MoveLeft() {
-        rigidb.AddForce(Vector2.left *minimumForce);
+        rigidb.velocity = new Vector2(-moveForce, rigidb.velocity.y);
     }
 
     private void MoveRight() {
-        rigidb.AddForce(Vector2.right * minimumForce);
+        rigidb.velocity = new Vector2(moveForce, rigidb.velocity.y);
     }
 
     private void Jump() {
-        rigidb.AddForce(Vector2.up * minimumForce * 50f);
+        if(grounded)rigidb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+    }
+
+    private void UpdateAnimations() {
+        if (anim) {
+            anim.SetFloat("speedX", rigidb.velocity.x);
+        }
     }
 
 }
