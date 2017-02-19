@@ -81,7 +81,7 @@ public class Player : MonoBehaviour {
 
     private void UpdateAnimations() {
         if (anim) {
-            anim.SetFloat("speedX", rigidb.velocity.x);
+            anim.SetFloat("speedX", Mathf.Abs(rigidb.velocity.x));
         }
     }
 
