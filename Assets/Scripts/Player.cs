@@ -10,7 +10,7 @@ public class Player : MonoBehaviour {
 
     private Rigidbody2D rigidb;
     private Animator anim;
-    private float jumpForce = 100f;
+    private float jumpForce = 200f;
     private float moveForce = 10f;
 
 
@@ -32,7 +32,7 @@ public class Player : MonoBehaviour {
         UpdateAnimations();
     }
 
-    public void OnCollisionEnter2D(Collision2D collision) {
+    public void OnCollisionStay2D(Collision2D collision) {
         if (CheckGrounded(collision.gameObject)) {
             grounded = true;
         }
