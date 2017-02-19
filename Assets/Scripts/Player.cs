@@ -13,6 +13,7 @@ public class Player : MonoBehaviour {
     private float jumpForce = 200f;
     private float moveForce = 10f;
 
+    private enum Face { RIGHT,LEFT }
 
     #region Monobehaviours
     void OnEnable() {
@@ -69,19 +70,42 @@ public class Player : MonoBehaviour {
 
     private void MoveLeft() {
         rigidb.velocity = new Vector2(-moveForce, rigidb.velocity.y);
+        SetFace(Face.LEFT);
     }
 
     private void MoveRight() {
         rigidb.velocity = new Vector2(moveForce, rigidb.velocity.y);
+        SetFace(Face.RIGHT);
     }
 
     private void Jump() {
         if(grounded)rigidb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
+    private void SetFace(Face facing) {
+        switch (facing) {
+            case Face.LEFT:
+                if (this.transform.localScale.x > 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+            case Face.RIGHT:
+                if(this.transform.localScale.x < 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+        }
+    }
+
     private void UpdateAnimations() {
         if (anim) {
-            anim.SetFloat("speedX", Mathf.Abs(rigidb.velocity.x));
+            anim.SetFloat("speed", Mathf.Abs(rigidb.velocity.x));
         }
     }
 
