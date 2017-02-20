@@ -5,13 +5,14 @@ using System;
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour {
 
+    public float jumpForce = 10f;
+    public float moveForce = 10f;
+
     [SerializeField]
     private bool grounded;
 
     private Rigidbody2D rigidb;
     private Animator anim;
-    private float jumpForce = 200f;
-    private float moveForce = 10f;
 
     private enum Face { RIGHT,LEFT }
 
@@ -79,7 +80,8 @@ public class Player : MonoBehaviour {
     }
 
     private void Jump() {
-        if(grounded)rigidb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        if(grounded)
+            rigidb.velocity = new Vector2(rigidb.velocity.x, jumpForce);
     }
 
     private void SetFace(Face facing) {
@@ -106,6 +108,8 @@ public class Player : MonoBehaviour {
     private void UpdateAnimations() {
         if (anim) {
             anim.SetFloat("speed", Mathf.Abs(rigidb.velocity.x));
+            anim.SetBool("grounded", this.grounded);
+            anim.SetFloat("fallingSpeed", rigidb.velocity.y);
         }
     }
 
