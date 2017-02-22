@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
 
     public float jumpForce = 10f;
     public float moveForce = 10f;
+    public float damage = 1f;
 
     [SerializeField]
     private bool grounded;
@@ -90,21 +91,25 @@ public class Player : MonoBehaviour {
     private float currentAttackCooldown = 0f;
     private void Attack() {
         if (currentAttackCooldown <= 0f) {
-            RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position, 0.1f, this.rigidb.transform.forward);
+            RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position+this.transform.forward*2f, 2f, this.rigidb.transform.forward);
             foreach (RaycastHit2D hit in hits) {
-                Debug.Log(hit);
+                if ((hit.collider.gameObject != this.gameObject) && hit.collider.GetComponent<Stats>()!=null) {
+                    //if hit is diferent from ourselfs and can be damaged
+                    Debug.Log(hit.collider.name);
+                    hit.collider.GetComponent<Stats>().GetHurt(damage);
+                    Debug.DrawLine(this.transform.position, hit.collider.transform.position);
+                }
             }
             StartCoroutine(CooldownAttack(comboCount++));
         }
-        Debug.Log(comboCount);
     }
 
     private IEnumerator CooldownAttack(int comboCount) {
         if (comboCount < 3) {
-            currentAttackCooldown = 1f;
+            currentAttackCooldown = 1.33f;
             anim.SetTrigger("attack");
         } else {
-            currentAttackCooldown = 3f;
+            currentAttackCooldown = 3.33f;
             this.comboCount = 0;
             anim.SetTrigger("special");
         }
