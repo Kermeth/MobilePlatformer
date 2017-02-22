@@ -5,14 +5,17 @@ using System;
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour {
 
+    public float jumpForce = 10f;
+    public float moveForce = 10f;
+    public float damage = 1f;
+
     [SerializeField]
     private bool grounded;
 
     private Rigidbody2D rigidb;
     private Animator anim;
-    private float jumpForce = 100f;
-    private float moveForce = 10f;
 
+    private enum Face { RIGHT,LEFT }
 
     #region Monobehaviours
     void OnEnable() {
@@ -32,7 +35,7 @@ public class Player : MonoBehaviour {
         UpdateAnimations();
     }
 
-    public void OnCollisionEnter2D(Collision2D collision) {
+    public void OnCollisionStay2D(Collision2D collision) {
         if (CheckGrounded(collision.gameObject)) {
             grounded = true;
         }
@@ -50,12 +53,14 @@ public class Player : MonoBehaviour {
         GameManager.Instance.input.OnLeftScreenTouchStationary += MoveLeft;
         GameManager.Instance.input.OnRightScreenTouchStationary += MoveRight;
         GameManager.Instance.input.OnJumpTouched += Jump;
+        GameManager.Instance.input.OnAttackTouched += Attack;
     }
 
     private void UnSuscribeToEvents() {
         GameManager.Instance.input.OnLeftScreenTouchStationary -= MoveLeft;
         GameManager.Instance.input.OnRightScreenTouchStationary -= MoveRight;
         GameManager.Instance.input.OnJumpTouched -= Jump;
+        GameManager.Instance.input.OnAttackTouched += Attack;
     }
 
 
@@ -69,19 +74,79 @@ public class Player : MonoBehaviour {
 
     private void MoveLeft() {
         rigidb.velocity = new Vector2(-moveForce, rigidb.velocity.y);
+        SetFace(Face.LEFT);
     }
 
     private void MoveRight() {
         rigidb.velocity = new Vector2(moveForce, rigidb.velocity.y);
+        SetFace(Face.RIGHT);
     }
 
     private void Jump() {
-        if(grounded)rigidb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        if(grounded)
+            rigidb.velocity = new Vector2(rigidb.velocity.x, jumpForce);
+    }
+
+    private int comboCount = 0;
+    private float currentAttackCooldown = 0f;
+    private void Attack() {
+        if (currentAttackCooldown <= 0f) {
+            RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position+this.transform.forward*2f, 2f, this.rigidb.transform.forward);
+            foreach (RaycastHit2D hit in hits) {
+                if ((hit.collider.gameObject != this.gameObject) && hit.collider.GetComponent<Stats>()!=null) {
+                    //if hit is diferent from ourselfs and can be damaged
+                    Debug.Log(hit.collider.name);
+                    hit.collider.GetComponent<Stats>().GetHurt(damage);
+                    Debug.DrawLine(this.transform.position, hit.collider.transform.position);
+                }
+            }
+            StartCoroutine(CooldownAttack(comboCount++));
+        }
+    }
+
+    private IEnumerator CooldownAttack(int comboCount) {
+        if (comboCount < 3) {
+            currentAttackCooldown = 1.33f;
+            anim.SetTrigger("attack");
+        } else {
+            currentAttackCooldown = 3.33f;
+            this.comboCount = 0;
+            anim.SetTrigger("special");
+        }
+        yield return new WaitForEndOfFrame();
+        while(currentAttackCooldown > 0f) {
+            currentAttackCooldown -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForEndOfFrame();
+    }
+
+    private void SetFace(Face facing) {
+        switch (facing) {
+            case Face.LEFT:
+                if (this.transform.localScale.x > 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+            case Face.RIGHT:
+                if(this.transform.localScale.x < 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+        }
     }
 
     private void UpdateAnimations() {
         if (anim) {
-            anim.SetFloat("speedX", rigidb.velocity.x);
+            anim.SetFloat("speed", Mathf.Abs(rigidb.velocity.x));
+            anim.SetBool("grounded", this.grounded);
+            anim.SetFloat("fallingSpeed", rigidb.velocity.y);
         }
     }
 

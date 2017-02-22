@@ -13,6 +13,9 @@ public class InputManager : MonoBehaviour {
     //Jump Event
     public delegate void OnJumpTouch();
     public event OnJumpTouch OnJumpTouched;
+    //Attack Event
+    public delegate void OnAttackTouch();
+    public event OnAttackTouch OnAttackTouched;
 
 
     //Variables for keyboard doubletap
@@ -65,8 +68,9 @@ public class InputManager : MonoBehaviour {
                 }
             }
 
-            if (Input.GetTouch(0).phase == TouchPhase.Stationary)
+            if (Input.GetTouch(0).phase == TouchPhase.Stationary && Input.touchCount<2)
             {
+                //One finger on the screen control
                 if(Input.GetTouch(0).position.x >= Screen.width / 2)
                 {
                     if (OnRightScreenTouchStationary != null)
@@ -79,6 +83,13 @@ public class InputManager : MonoBehaviour {
                     if (OnLeftScreenTouchStationary != null)
                     {
                         OnLeftScreenTouchStationary();
+                    }
+                }
+            }
+            if (Input.touchCount > 1) {
+                if(Input.GetTouch(0).phase == TouchPhase.Stationary && Input.GetTouch(1).phase == TouchPhase.Stationary) {
+                    if (OnAttackTouched != null) {
+                        OnAttackTouched();
                     }
                 }
             }
