@@ -8,6 +8,8 @@ public class Player : MonoBehaviour {
     public float jumpForce = 10f;
     public float moveForce = 10f;
     public float damage = 1f;
+    public float specialAttackDamage = 2f;
+    public int specialAttacComboNumber = 4;
 
     [SerializeField]
     private bool grounded;
@@ -15,6 +17,9 @@ public class Player : MonoBehaviour {
     private Rigidbody2D rigidb;
     private Animator anim;
 
+    /// <summary>
+    /// The character is facing right or left
+    /// </summary>
     private enum Face { RIGHT,LEFT }
 
     #region Monobehaviours
@@ -33,6 +38,7 @@ public class Player : MonoBehaviour {
 
     void FixedUpdate() {
         UpdateAnimations();
+        currentAttackCooldown -= Time.fixedDeltaTime;
     }
 
     public void OnCollisionStay2D(Collision2D collision) {
@@ -91,34 +97,35 @@ public class Player : MonoBehaviour {
     private float currentAttackCooldown = 0f;
     private void Attack() {
         if (currentAttackCooldown <= 0f) {
-            RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position+this.transform.forward*2f, 2f, this.rigidb.transform.forward);
-            foreach (RaycastHit2D hit in hits) {
-                if ((hit.collider.gameObject != this.gameObject) && hit.collider.GetComponent<Stats>()!=null) {
-                    //if hit is diferent from ourselfs and can be damaged
-                    Debug.Log(hit.collider.name);
-                    hit.collider.GetComponent<Stats>().GetHurt(damage);
-                    Debug.DrawLine(this.transform.position, hit.collider.transform.position);
-                }
-            }
+            
             StartCoroutine(CooldownAttack(comboCount++));
         }
     }
 
     private IEnumerator CooldownAttack(int comboCount) {
-        if (comboCount < 3) {
-            currentAttackCooldown = 1.33f;
+        if (comboCount < specialAttacComboNumber) {
+            currentAttackCooldown = 0.33f;
             anim.SetTrigger("attack");
+            yield return new WaitForSeconds(0.1f);
+            PerformAttack(damage);
         } else {
-            currentAttackCooldown = 3.33f;
+            currentAttackCooldown = 2.33f;
             this.comboCount = 0;
             anim.SetTrigger("special");
+            yield return new WaitForSeconds(0.1f);
+            PerformAttack(specialAttackDamage);
         }
         yield return new WaitForEndOfFrame();
-        while(currentAttackCooldown > 0f) {
-            currentAttackCooldown -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+    }
+
+    private void PerformAttack(float dmg) {
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position + this.transform.forward * 3f, 2f, this.rigidb.transform.forward);
+        foreach (RaycastHit2D hit in hits) {
+            if ((hit.collider.gameObject != this.gameObject) && hit.collider.GetComponent<Stats>() != null) {
+                //if hit is diferent from ourselfs and can be damaged
+                hit.collider.GetComponent<Stats>().GetHurt(dmg);
+            }
         }
-        yield return new WaitForEndOfFrame();
     }
 
     private void SetFace(Face facing) {
