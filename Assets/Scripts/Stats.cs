@@ -6,8 +6,9 @@ using UnityEngine;
 public class Stats : MonoBehaviour {
 
     public float maxLife = 10f;
-    [SerializeField]
-    private float currentLife;
+    public float currentLife {
+        get; private set;
+    }
 
     void Start() {
         currentLife = maxLife;
