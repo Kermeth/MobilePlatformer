@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
 
+    public float speed;
+
     public Rigidbody2D rb {
         private set; get;
     }
     public Collider2D floor {
         private set; get;
     }
+    [HideInInspector]
+    public Face facing = Face.RIGHT;
+
+    private Animator anim;
 
     private IState currentState;
     private PatrolState patrolState;
@@ -17,6 +23,7 @@ public class EnemyController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         rb = this.GetComponent<Rigidbody2D>();
+        anim = this.GetComponentInChildren<Animator>();
 
         patrolState = new PatrolState(this);
         ChangeState(patrolState);
@@ -24,6 +31,7 @@ public class EnemyController : MonoBehaviour {
 	
     void FixedUpdate() {
         currentState.OnStateUpdate();
+        UpdateAnimations();
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -38,9 +46,43 @@ public class EnemyController : MonoBehaviour {
         }
     }
 
+    private void UpdateAnimations() {
+        anim.SetFloat("speed", Mathf.Abs(rb.velocity.x));
+    }
 
+    public void MoveLeft() {
+        rb.velocity = new Vector2(-speed, rb.velocity.y);
+        SetFace(Face.LEFT);
+    }
 
-	public void ChangeState(IState newState) {
+    public void MoveRight() {
+        rb.velocity = new Vector2(speed, rb.velocity.y);
+        SetFace(Face.RIGHT);
+    }
+
+    private void SetFace(Face facing) {
+        switch (facing) {
+            case Face.LEFT:
+                if (this.transform.localScale.x > 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+            case Face.RIGHT:
+                if (this.transform.localScale.x < 0) {
+                    this.transform.localScale = new Vector3(
+                        -1 * this.transform.localScale.x,
+                        this.transform.localScale.y,
+                        this.transform.localScale.z);
+                }
+                break;
+        }
+        this.facing = facing;
+    }
+
+    public void ChangeState(IState newState) {
         if (currentState != null) currentState.OnStateExit();
         currentState = newState;
         currentState.OnStateEnter();
