@@ -18,26 +18,26 @@ public class PatrolState : IState {
     }
 
     public void OnStateExit() {
-        throw new NotImplementedException();
+        Debug.Log("I stopped Patrolling");
     }
 
     public void OnStateUpdate() {
         if (this.self.floor != null) {
             minimumX = this.self.floor.bounds.min.x;
             maximumX = this.self.floor.bounds.max.x;
-        }
 
-        if (this.self.facing == Face.RIGHT) {
-            if(this.self.transform.position.x < maximumX) {
-                self.MoveRight();
+            if (this.self.facing == Face.RIGHT) {
+                if (this.self.transform.position.x < maximumX) {
+                    self.MoveRight();
+                } else {
+                    self.MoveLeft();
+                }
             } else {
-                self.MoveLeft();
-            }
-        } else {
-            if(this.self.transform.position.x > minimumX) {
-                self.MoveLeft();
-            } else {
-                self.MoveRight();
+                if (this.self.transform.position.x > minimumX) {
+                    self.MoveLeft();
+                } else {
+                    self.MoveRight();
+                }
             }
         }
     }

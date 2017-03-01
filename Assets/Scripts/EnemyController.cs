@@ -12,25 +12,38 @@ public class EnemyController : MonoBehaviour {
     public Collider2D floor {
         private set; get;
     }
+    public Scanner scanner {
+        private set; get;
+    }
     [HideInInspector]
     public Face facing = Face.RIGHT;
 
     private Animator anim;
 
     private IState currentState;
+    private ChaseState chaseState;
     private PatrolState patrolState;
 
 	// Use this for initialization
 	void Start () {
         rb = this.GetComponent<Rigidbody2D>();
         anim = this.GetComponentInChildren<Animator>();
+        scanner = this.GetComponentInChildren<Scanner>();
 
+        chaseState = new ChaseState(this);
         patrolState = new PatrolState(this);
         ChangeState(patrolState);
     }
 	
     void FixedUpdate() {
+        if (scanner.target != null) {
+            ChangeState(chaseState);
+        } else {
+            ChangeState(patrolState);
+        }
+
         currentState.OnStateUpdate();
+
         UpdateAnimations();
     }
 
@@ -83,9 +96,11 @@ public class EnemyController : MonoBehaviour {
     }
 
     public void ChangeState(IState newState) {
-        if (currentState != null) currentState.OnStateExit();
-        currentState = newState;
-        currentState.OnStateEnter();
+        if(currentState != newState) {
+            if(currentState!=null)currentState.OnStateExit();
+            currentState = newState;
+            currentState.OnStateEnter();
+        }
     }
 
     private bool CheckGrounded(GameObject subject) {
