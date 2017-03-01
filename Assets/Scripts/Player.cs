@@ -17,11 +17,6 @@ public class Player : MonoBehaviour {
     private Rigidbody2D rigidb;
     private Animator anim;
 
-    /// <summary>
-    /// The character is facing right or left
-    /// </summary>
-    private enum Face { RIGHT,LEFT }
-
     #region Monobehaviours
     void OnEnable() {
         //Suscribe to movement Events
@@ -119,7 +114,7 @@ public class Player : MonoBehaviour {
     }
 
     private void PerformAttack(float dmg) {
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position + this.transform.forward * 3f, 2f, this.rigidb.transform.forward);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(this.transform.position + this.transform.forward * 3f, 3f, this.rigidb.transform.forward);
         foreach (RaycastHit2D hit in hits) {
             if ((hit.collider.gameObject != this.gameObject) && hit.collider.GetComponent<Stats>() != null) {
                 //if hit is diferent from ourselfs and can be damaged

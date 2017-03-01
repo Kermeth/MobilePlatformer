@@ -32,7 +32,7 @@ public class InputManager : MonoBehaviour {
                     OnJumpTouched();
                 }
             } else {
-                delay = 0.5f;
+                delay = 0.3f;
                 tapCount += 1;
             }
         }
