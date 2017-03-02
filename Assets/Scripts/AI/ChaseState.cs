@@ -13,21 +13,30 @@ public class ChaseState : IState {
 
     public void OnStateEnter() {
         Debug.Log("Found you!");
+        
     }
 
     public void OnStateExit() {
-        
+        Debug.Log("I lost you");
     }
 
     public void OnStateUpdate() {
         if (self.scanner.target!=null) {
-            if(self.scanner.target.position.x < self.transform.position.x) {
-                self.MoveLeft();
+            if(self.DistanceToEnemy() > 3f) {
+                if (self.scanner.target.position.x < self.transform.position.x) {
+                    self.MoveLeft();
+                } else {
+                    self.MoveRight();
+                }
             } else {
-                self.MoveRight();
+                if (self.CanAttack()) {
+                    self.Attack();
+                }
             }
         } else {
             self.ChangeState(new PatrolState(self));
         }
     }
+
+    
 }

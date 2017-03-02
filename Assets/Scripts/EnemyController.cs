@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
 
     public float speed;
+    public float attackDmg = 1f;
+    public float attackCooldown = 3f;
 
     public Rigidbody2D rb {
         private set; get;
@@ -19,10 +22,8 @@ public class EnemyController : MonoBehaviour {
     public Face facing = Face.RIGHT;
 
     private Animator anim;
-
     private IState currentState;
-    private ChaseState chaseState;
-    private PatrolState patrolState;
+    private float currentAttackCooldown;
 
 	// Use this for initialization
 	void Start () {
@@ -30,17 +31,13 @@ public class EnemyController : MonoBehaviour {
         anim = this.GetComponentInChildren<Animator>();
         scanner = this.GetComponentInChildren<Scanner>();
 
-        chaseState = new ChaseState(this);
-        patrolState = new PatrolState(this);
-        ChangeState(patrolState);
+        currentAttackCooldown = attackCooldown;
+
+        ChangeState(new PatrolState(this));
     }
 	
     void FixedUpdate() {
-        if (scanner.target != null) {
-            ChangeState(chaseState);
-        } else {
-            ChangeState(patrolState);
-        }
+        currentAttackCooldown -= Time.fixedDeltaTime;
 
         currentState.OnStateUpdate();
 
@@ -71,6 +68,38 @@ public class EnemyController : MonoBehaviour {
     public void MoveRight() {
         rb.velocity = new Vector2(speed, rb.velocity.y);
         SetFace(Face.RIGHT);
+    }
+
+    public bool CanAttack() {
+        if (currentAttackCooldown <= 0f) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void Attack() {
+        if (CanAttack()) {
+            StartCoroutine(PerformAttack());
+        }
+    }
+
+    private IEnumerator PerformAttack() {
+        yield return new WaitForEndOfFrame();
+        currentAttackCooldown = attackCooldown;
+        anim.SetTrigger("attack");
+        yield return new WaitForSeconds(0.1f);//let the animation start
+        if (DistanceToEnemy() < 3f) {
+            scanner.target.GetComponent<Stats>().GetHurt(this.attackDmg);
+        }
+    }
+
+    public float DistanceToEnemy() {
+        if (scanner.target != null) {
+            return Vector2.Distance(this.scanner.target.position, this.transform.position);
+        } else {
+            return Mathf.Infinity;
+        }
     }
 
     private void SetFace(Face facing) {

@@ -40,6 +40,10 @@ public class PatrolState : IState {
                 }
             }
         }
+
+        if (self.scanner.target != null) {
+            self.ChangeState(new ChaseState(self));
+        }
     }
 
 }
