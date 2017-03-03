@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class InputManager : MonoBehaviour {
 
@@ -70,19 +71,16 @@ public class InputManager : MonoBehaviour {
 
             if (Input.GetTouch(0).phase == TouchPhase.Stationary && Input.touchCount<2)
             {
-                //One finger on the screen control
-                if(Input.GetTouch(0).position.x >= Screen.width / 2)
-                {
-                    if (OnRightScreenTouchStationary != null)
-                    {
-                        OnRightScreenTouchStationary();
-                    }
-                }
-                else
-                {
-                    if (OnLeftScreenTouchStationary != null)
-                    {
-                        OnLeftScreenTouchStationary();
+                if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)) {
+                    //One finger on the screen control
+                    if (Input.GetTouch(0).position.x >= Screen.width / 2) {
+                        if (OnRightScreenTouchStationary != null) {
+                            OnRightScreenTouchStationary();
+                        }
+                    } else {
+                        if (OnLeftScreenTouchStationary != null) {
+                            OnLeftScreenTouchStationary();
+                        }
                     }
                 }
             }

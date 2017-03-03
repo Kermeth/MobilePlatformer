@@ -10,12 +10,16 @@ public class Player : MonoBehaviour {
     public float damage = 1f;
     public float specialAttackDamage = 2f;
     public int specialAttacComboNumber = 4;
+    public float attackCooldown = 0.33f;
+    public float specialAttackCooldown = 2.33f;
 
     [SerializeField]
     private bool grounded;
 
     private Rigidbody2D rigidb;
     private Animator anim;
+    private int comboCount = 0;
+    public float currentAttackCooldown { private set; get; }
 
     #region Monobehaviours
     void OnEnable() {
@@ -25,6 +29,7 @@ public class Player : MonoBehaviour {
         GameManager.Instance.currentState = GameState.Playing;
         rigidb = this.GetComponent<Rigidbody2D>();
         anim = this.GetComponentInChildren<Animator>();
+        currentAttackCooldown = 0f;
     }
 
     void OnDisable() {
@@ -49,6 +54,10 @@ public class Player : MonoBehaviour {
     }
 
     #endregion Monobehaviours
+
+    public int GetCurrentComboCount() {
+        return this.comboCount;
+    }
 
     private void SuscribeToEvents() {
         GameManager.Instance.input.OnLeftScreenTouchStationary += MoveLeft;
@@ -88,8 +97,6 @@ public class Player : MonoBehaviour {
             rigidb.velocity = new Vector2(rigidb.velocity.x, jumpForce);
     }
 
-    private int comboCount = 0;
-    private float currentAttackCooldown = 0f;
     private void Attack() {
         if (currentAttackCooldown <= 0f) {
             
@@ -99,12 +106,12 @@ public class Player : MonoBehaviour {
 
     private IEnumerator CooldownAttack(int comboCount) {
         if (comboCount < specialAttacComboNumber) {
-            currentAttackCooldown = 0.33f;
+            currentAttackCooldown = attackCooldown;
             anim.SetTrigger("attack");
             yield return new WaitForSeconds(0.1f);
             PerformAttack(damage);
         } else {
-            currentAttackCooldown = 2.33f;
+            currentAttackCooldown = specialAttackCooldown;
             this.comboCount = 0;
             anim.SetTrigger("special");
             yield return new WaitForSeconds(0.1f);
