@@ -21,6 +21,13 @@ public class Stats : MonoBehaviour {
         }
     }
 
+    public void Heal(float amount) {
+        currentLife += amount;
+        if (currentLife > maxLife) {
+            currentLife = maxLife;
+        }
+    }
+
     private void Die() {
         this.gameObject.SetActive(false);
     }
