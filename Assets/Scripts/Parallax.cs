@@ -19,7 +19,6 @@ public class Parallax : MonoBehaviour {
 	}
 
     void Update() {
-        
         Vector2 currentOffset=render.sharedMaterial.GetTextureOffset("_MainTex");
         Vector2 newOffset = Vector2.zero;
         if (readPlayerSpeed) {
@@ -32,6 +31,8 @@ public class Parallax : MonoBehaviour {
     }
 
     void OnDisable() {
-        render.sharedMaterial.SetTextureOffset("_MainTex", savedOffset);
+        if(render!= null) {
+            render.sharedMaterial.SetTextureOffset("_MainTex", savedOffset);
+        }
     }
 }

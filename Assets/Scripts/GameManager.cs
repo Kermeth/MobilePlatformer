@@ -10,10 +10,6 @@ public class GameManager : Singleton<GameManager> {
     protected GameManager() {
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
     }
-
-    private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1) {
-        this.FillCheckPoints();
-    }
     #endregion
 
     #region GameState
@@ -88,6 +84,33 @@ public class GameManager : Singleton<GameManager> {
         foreach (CheckPoint check in checkPoints.Where<CheckPoint>(x=> !x.Equals(checkpoint))) {
             check.active = false;
         }
+    }
+    #endregion
+
+    #region SceneManagement
+    public Scene GetCurrentScene() {
+        return SceneManager.GetActiveScene();
+    }
+
+    public void GoToScene(string name) {
+        StartCoroutine(loadingOperation(name));
+    }
+    public bool firstTime = true;
+    private IEnumerator loadingOperation(string sceneToGo) {
+        yield return new WaitForEndOfFrame();
+        SceneManager.LoadScene("LoadingScreen");
+        yield return new WaitForEndOfFrame();
+        LoadingBar loadingBar = FindObjectOfType<LoadingBar>();
+        AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(sceneToGo);
+        while (!loadingOperation.isDone) {
+            loadingBar.UpdateValue(loadingOperation.progress);
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForEndOfFrame();
+    }
+
+    private void SceneManager_sceneLoaded(Scene currentScene, LoadSceneMode sceneMode) {
+        this.FillCheckPoints();
     }
     #endregion
 
