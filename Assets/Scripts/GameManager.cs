@@ -6,6 +6,7 @@ using System.Linq;
 
 public class GameManager : Singleton<GameManager> {
 
+    #region Constructor
     protected GameManager() {
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
     }
@@ -13,6 +14,7 @@ public class GameManager : Singleton<GameManager> {
     private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1) {
         this.FillCheckPoints();
     }
+    #endregion
 
     #region GameState
     // Event Handler
@@ -48,6 +50,10 @@ public class GameManager : Singleton<GameManager> {
             }
             return _player;
         }
+    }
+    public void PlayerRespawn() {
+        player.transform.position = GetActiveCheckPoint().transform.position;
+        player.GetComponent<Stats>().Heal(player.GetComponent<Stats>().maxLife);
     }
     #endregion Player
 

@@ -17,6 +17,7 @@ public class Stats : MonoBehaviour {
     public void GetHurt(float amount) {
         currentLife -= amount;
         if (currentLife <= 0f) {
+            currentLife = 0f;
             Die();
         }
     }
@@ -29,6 +30,10 @@ public class Stats : MonoBehaviour {
     }
 
     private void Die() {
-        this.gameObject.SetActive(false);
+        if (this.GetComponent<Player>()) {
+            GameManager.Instance.PlayerRespawn();
+        } else {
+            this.gameObject.SetActive(false);
+        }
     }
 }
