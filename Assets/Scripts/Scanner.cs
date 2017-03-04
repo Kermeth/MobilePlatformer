@@ -16,7 +16,6 @@ public class Scanner : MonoBehaviour {
     }
 
     void OnTriggerExit2D(Collider2D collider) {
-        Debug.Log(collider.name);
         if(collider.transform == target) {
             target = null;
         }

@@ -1,8 +1,18 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class GameManager : Singleton<GameManager> {
 
+    protected GameManager() {
+        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+    }
+
+    private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1) {
+        this.FillCheckPoints();
+    }
 
     #region GameState
     // Event Handler
@@ -56,5 +66,23 @@ public class GameManager : Singleton<GameManager> {
         }
     }
     #endregion InputManager
+
+    #region CheckPoints
+    List<CheckPoint> checkPoints = new List<CheckPoint>();
+    public void FillCheckPoints() {
+        checkPoints.Clear();
+        checkPoints.AddRange(FindObjectsOfType<CheckPoint>());
+    }
+
+    public CheckPoint GetActiveCheckPoint() {
+        return checkPoints.FirstOrDefault<CheckPoint>(x => x.active == true);
+    }
+
+    public void ActivateCheckPoint(CheckPoint checkpoint) {
+        foreach (CheckPoint check in checkPoints.Where<CheckPoint>(x=> !x.Equals(checkpoint))) {
+            check.active = false;
+        }
+    }
+    #endregion
 
 }
