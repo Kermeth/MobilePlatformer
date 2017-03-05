@@ -12,6 +12,9 @@ public class Utils : MonoBehaviour {
     }
 
     public void GoToScene(string scene) {
+        if (GameManager.Instance.firstTime) {
+            GameManager.Instance.firstTime = false;
+        }
         GameManager.Instance.GoToScene(scene);
     }
 
