@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<LevelsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Levels>
+    <Level>
+      <name>1</name>
+      <blocked>false</blocked>
+      <sceneIndexName>Level1</sceneIndexName>
+    </Level>
+  </Levels>
+</LevelsList>

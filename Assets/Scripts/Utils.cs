@@ -9,9 +9,10 @@ public class Utils : MonoBehaviour {
             GameManager.Instance.firstTime = false;
             GameManager.Instance.GoToScene("MainMenu");
         }
+        //SaveALevel();
     }
 
-    public void GoToScene(string scene) {
+    public static void GoToScene(string scene) {
         if (GameManager.Instance.firstTime) {
             GameManager.Instance.firstTime = false;
         }
@@ -20,6 +21,15 @@ public class Utils : MonoBehaviour {
 
 	public void FinishLevel() {
 
+    }
+
+    public void SaveALevel() {
+        Level level1 = new Level();
+        level1.blocked = false;
+        level1.name = "Level1";
+        LevelsXml newLevels = new LevelsXml();
+        newLevels.levelsList.Add(level1);
+        newLevels.Save(Application.persistentDataPath + "/levels.xml");
     }
 
 }

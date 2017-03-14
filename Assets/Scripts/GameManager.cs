@@ -95,12 +95,16 @@ public class GameManager : Singleton<GameManager> {
     public void GoToScene(string name) {
         StartCoroutine(loadingOperation(name));
     }
+    public void GoToScene(int buildIndex) {
+        
+    }
     public bool firstTime = true;
     private IEnumerator loadingOperation(string sceneToGo) {
         yield return new WaitForEndOfFrame();
         SceneManager.LoadScene("LoadingScreen");
         yield return new WaitForEndOfFrame();
         LoadingBar loadingBar = FindObjectOfType<LoadingBar>();
+        Debug.Log("scene to go: " + sceneToGo);
         AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(sceneToGo);
         while (!loadingOperation.isDone) {
             loadingBar.UpdateValue(loadingOperation.progress);
@@ -111,6 +115,44 @@ public class GameManager : Singleton<GameManager> {
 
     private void SceneManager_sceneLoaded(Scene currentScene, LoadSceneMode sceneMode) {
         this.FillCheckPoints();
+    }
+    #endregion
+
+    #region UIPanels
+    private List<UIPanel> _uiPanels = new List<UIPanel>();
+    public UIPanel FindPanelContains(string name) {
+        if (_uiPanels.Count <= 0) {
+            _uiPanels.AddRange(FindObjectsOfType<UIPanel>());
+        }
+        foreach(UIPanel panel in _uiPanels) {
+            if (panel.name.Contains(name))
+                return panel;
+        }
+        return null;
+    }
+    #endregion
+
+    #region LevelsXml
+    private LevelsXml _levelsList;
+    public LevelsXml LevelsList {
+        get {
+            if (_levelsList == null) {
+                TextAsset xml = (TextAsset)Resources.Load("levels");
+                _levelsList = LevelsXml.LoadFromText(xml.text);
+            }
+            return _levelsList;
+        }
+    }
+    public List<Level> GetLevelList() {
+        return LevelsList.levelsList;
+    }
+    public void UnlockNextLevel(string currentLevel) {
+        int index=LevelsList.levelsList.FindIndex( x => x.sceneIndexName.Equals(currentLevel));
+        Level nextLevel=LevelsList.levelsList.ElementAt(index + 1);
+        if (nextLevel != null) {
+            nextLevel.blocked = false;
+        }
+        
     }
     #endregion
 
