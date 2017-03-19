@@ -20,7 +20,7 @@ public class Utils : MonoBehaviour {
     }
 
 	public void FinishLevel() {
-
+        GoToScene("MainMenu");
     }
 
     public void SaveALevel() {
@@ -30,6 +30,10 @@ public class Utils : MonoBehaviour {
         LevelsXml newLevels = new LevelsXml();
         newLevels.levelsList.Add(level1);
         newLevels.Save(Application.persistentDataPath + "/levels.xml");
+    }
+
+    public void ExitGame() {
+        Application.Quit();
     }
 
 }

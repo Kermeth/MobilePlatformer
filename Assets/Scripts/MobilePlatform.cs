@@ -34,4 +34,15 @@ public class MobilePlatform : MonoBehaviour {
         transform.position = Vector3.SmoothDamp(this.transform.position, currentMarker,ref velocity, speed);
     }
 
+    void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.GetComponent<Player>()) {
+            collision.transform.parent = this.transform;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision) {
+        if (collision.gameObject.GetComponent<Player>()) {
+            collision.transform.parent = null;
+        }
+    }
 }
