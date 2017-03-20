@@ -33,7 +33,7 @@ public class InputManager : MonoBehaviour {
                     OnJumpTouched();
                 }
             } else {
-                delay = 0.3f;
+                delay = 0.4f;
                 tapCount += 1;
             }
         }
@@ -62,8 +62,8 @@ public class InputManager : MonoBehaviour {
         #if UNITY_ANDROID
         if (Input.touchCount > 0)
         {
-
-            if (Input.GetTouch(0).tapCount == 2) {
+            Debug.Log(Input.GetTouch(0).tapCount);
+            if (Input.GetTouch(0).phase == TouchPhase.Began && Input.GetTouch(0).tapCount >= 2) {
                 if (OnJumpTouched != null) {
                     OnJumpTouched();
                 }
