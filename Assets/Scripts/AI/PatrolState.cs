@@ -14,11 +14,11 @@ public class PatrolState : IState {
     }
 
     public void OnStateEnter() {
-        Debug.Log("I'm Patrolling");
+        //Debug.Log("I'm Patrolling");
     }
 
     public void OnStateExit() {
-        Debug.Log("I stopped Patrolling");
+        //Debug.Log("I stopped Patrolling");
     }
 
     public void OnStateUpdate() {

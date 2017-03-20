@@ -104,7 +104,6 @@ public class GameManager : Singleton<GameManager> {
         SceneManager.LoadScene("LoadingScreen");
         yield return new WaitForEndOfFrame();
         LoadingBar loadingBar = FindObjectOfType<LoadingBar>();
-        Debug.Log("scene to go: " + sceneToGo);
         AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(sceneToGo);
         while (!loadingOperation.isDone) {
             loadingBar.UpdateValue(loadingOperation.progress);
@@ -121,9 +120,8 @@ public class GameManager : Singleton<GameManager> {
     #region UIPanels
     private List<UIPanel> _uiPanels = new List<UIPanel>();
     public UIPanel FindPanelContains(string name) {
-        if (_uiPanels.Count <= 0) {
-            _uiPanels.AddRange(FindObjectsOfType<UIPanel>());
-        }
+        _uiPanels.Clear();
+        _uiPanels.AddRange(FindObjectsOfType<UIPanel>());
         foreach(UIPanel panel in _uiPanels) {
             if (panel.name.Contains(name))
                 return panel;
